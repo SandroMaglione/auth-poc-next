@@ -1,4 +1,4 @@
-import { Context, Data, Effect, Secret } from "effect";
+import { Config, Context, Data, Effect, Layer, Secret } from "effect";
 import * as _Jose from "jose";
 import * as TextEncoder from "./TextEncoder";
 
@@ -31,4 +31,11 @@ const makeJoseJwt = (config: JwtConfig) => ({
 export class Jwt extends Context.Tag("Jwt")<
   Jwt,
   ReturnType<typeof makeJoseJwt>
->() {}
+>() {
+  static readonly Live = Layer.effect(
+    this,
+    Effect.map(Config.secret("secretKey"), (secretKey) =>
+      makeJoseJwt({ secretKey })
+    )
+  );
+}
